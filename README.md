@@ -1,0 +1,2 @@
+# goexample
+golang example

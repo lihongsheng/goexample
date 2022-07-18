@@ -7,7 +7,7 @@
     2. 示例：import 引入其他的定义的.proto文件，类似于go用的import。
        package 命名空间的意思
     3. 定义好之后：使用第一步下载好的protoc文件执行生成语言代码操作.<br>
-       如抖音的 protoc --go_out=plugins=grpc:. ./opentrace/proto/*.proto --proto_path=./ 
+       如抖音的 protoc --go_out=plugins=grpc:. ./opentrace/proto/*.proto --proto_path=./
        --go_out是自定生成的具体文件类所在根目录，会依据proto定义的package【自己定义的命名空间规则】在这个目录下生成目录及文件。<br>
        --proto_path 是引入其他proto文件的目录，当多个自定义的proto文件之间有引入的时候需要指定这个目录，另外需要拷贝第一步下载的目录里的google这个目录到当前命令执行目录下，这个里边是谷歌定义的一些元 proto类型，如Any.proto可以表示是任意类型
 * 使用特别提示
@@ -16,3 +16,17 @@
         使用 protoc --decode_raw可以解析源二进制文件为正常的数据文件，依据数据文件可以自己定义数据的结构体文件 .proto
 #### 调试grpc
    可以使用 grpcui工具调试
+
+#### trace
+```shell
+docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest
+```

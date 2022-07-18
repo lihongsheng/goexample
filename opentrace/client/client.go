@@ -8,9 +8,11 @@ import (
 	"goexample/opentrace"
 	"goexample/opentrace/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"os"
+	"time"
 )
 
 type Client struct {
@@ -32,20 +34,24 @@ func (c *Client) Start(ctx context.Context) {
 	}
 	spanCtx := opentracing.ContextWithSpan(ctx, span)
 
+	c.Brother1(spanCtx)
 	c.srvClient.Req(spanCtx)
+	c.Brother2(spanCtx)
 	defer span.Finish()
 }
 
 func (c *Client) Brother1(ctx context.Context) {
 	// 先从ctx 中取 span
-	span := opentracing.SpanFromContext(ctx)
-	if span == nil {
-		// 如果无法取道,新建一个span
-		span = opentracing.StartSpan("Brother1")
-	} else {
-		span, _ = opentracing.StartSpanFromContext(ctx, "Brother1")
-	}
-
+	//span := opentracing.SpanFromContext(ctx)
+	//if span == nil {
+	//	fmt.Println("start-----Brother1")
+	//	// 如果无法取道,新建一个span
+	//	span = opentracing.StartSpan("Brother1")
+	//} else {
+	fmt.Println("start-Brother1")
+	span, _ := opentracing.StartSpanFromContext(ctx, "Brother1")
+	//}
+	time.Sleep(2 * time.Second)
 	defer span.Finish()
 }
 func (c *Client) Brother2(ctx context.Context) {
@@ -53,11 +59,13 @@ func (c *Client) Brother2(ctx context.Context) {
 	span := opentracing.SpanFromContext(ctx)
 	if span == nil {
 		// 如果无法取道,新建一个span
+		fmt.Println("start-----Brother2")
 		span = opentracing.StartSpan("Brother2")
 	} else {
+		fmt.Println("start-Brother2")
 		span, _ = opentracing.StartSpanFromContext(ctx, "Brother2")
 	}
-
+	time.Sleep(2 * time.Second)
 	defer span.Finish()
 }
 
@@ -141,7 +149,7 @@ func main() {
 	//  ),
 	//}
 
-	con, err := grpc.Dial("127.0.0.1:8990")
+	con, err := grpc.Dial("127.0.0.1:8990", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -153,4 +161,5 @@ func main() {
 	cl := NewClient(srv)
 	cl.Start(ctx)
 
+	time.Sleep(5 * time.Second)
 }

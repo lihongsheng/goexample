@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"time"
 )
 
 var port = flag.Int("port", 50000, "port number")
@@ -22,7 +23,8 @@ var port = flag.Int("port", 50000, "port number")
 type server struct {
 }
 
-func (s *server) Say(context.Context, *pb.EchoRequest) (*pb.EchoResponse, error) {
+func (s *server) Say(ctx context.Context, p *pb.EchoRequest) (*pb.EchoResponse, error) {
+	s.Brother1(ctx)
 	return &pb.EchoResponse{Message: []byte("hello world")}, nil
 }
 
@@ -31,10 +33,13 @@ func (c *server) Brother1(ctx context.Context) {
 	span := opentracing.SpanFromContext(ctx)
 	if span == nil {
 		// 如果无法取道,新建一个span
+		fmt.Println("start-----Brother1")
 		span = opentracing.StartSpan("server-Brother1")
 	} else {
+		fmt.Println("start-Brother1")
 		span, _ = opentracing.StartSpanFromContext(ctx, "server-Brother1")
 	}
+	time.Sleep(2 * time.Second)
 	defer span.Finish()
 }
 
@@ -63,7 +68,7 @@ func tracingWrapper(h http.Handler) http.Handler {
 func main() {
 	flag.Parse()
 
-	listen, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:8990"))
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:8990"))
 	//listen, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:8990", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
+	"github.com/uber/jaeger-client-go"
 	"goexample/opentrace"
 	"goexample/opentrace/pb"
 	"google.golang.org/grpc"
@@ -34,6 +35,10 @@ func (c *Client) Start(ctx context.Context) {
 	}
 	spanCtx := opentracing.ContextWithSpan(ctx, span)
 
+	// 获取traceID
+	if s, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println(s.TraceID())
+	}
 	c.Brother1(spanCtx)
 	c.srvClient.Req(spanCtx)
 	c.Brother2(spanCtx)

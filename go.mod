@@ -3,10 +3,13 @@ module goexample
 go 1.16
 
 require (
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
+	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
+	github.com/golang/protobuf v1.5.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+	github.com/opentracing/opentracing-go v1.2.0
+	github.com/prometheus/client_golang v1.12.2
+	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	google.golang.org/grpc v1.45.0
-	google.golang.org/protobuf v1.26.0
 )

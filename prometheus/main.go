@@ -64,10 +64,10 @@ func main() {
 		})
 	)
 
-	httpApi := prometheus.NewCounter(prometheus.CounterOpts{
+	httpApi := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "http_count_seconds",
 		Help: "http count distributions.",
-	})
+	}, []string{"service"})
 
 	// Register the summary and the histogram with Prometheus's default registry.
 	prometheus.MustRegister(rpcDurations)
@@ -115,10 +115,11 @@ func main() {
 			time.Sleep(time.Duration(50*oscillationFactor()) * time.Millisecond)
 		}
 	}()
-
+	// https://github.com/wufeiqun/blog/blob/master/prometheus/2.%E4%BD%BF%E7%94%A8Prometheus%E7%9B%91%E6%8E%A7%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4.md
 	http.HandleFunc("/live", func(writer http.ResponseWriter, request *http.Request) {
-		httpApi.Inc()
+		httpApi.WithLabelValues("/live").Inc()
 		writer.Write([]byte("string"))
+		rpcDurations.WithLabelValues("/live").Observe()
 	})
 
 	// Expose the registered metrics via HTTP.
